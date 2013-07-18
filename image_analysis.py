@@ -19,7 +19,6 @@ import os
 import matplotlib.pyplot as plt
 import re
 
-# get all the file paths
 STUFFDIR = '/home/colinc/storage/ERL/ERLstuff'
 walktree = os.walk(STUFFDIR,topdown=True, followlinks=False)
 allfiles=[]
@@ -59,16 +58,13 @@ def sortfiles():
     outdict['A4hor']=ah
     return outdict
 
-#----------------------------
 sortedfiles=sortfiles()
 
 bvlen=len(sortedfiles['B1ver'])
 bhlen=len(sortedfiles['B1hor'])
 avlen=len(sortedfiles['A4ver'])
 ahlen=len(sortedfiles['A4hor'])
-#----------------------------
 
-#load .mat file and format, takes kind and num
 def loadnum(num, kind = 'B1hor', res = 0):
     """Loads .mat file and outputs dictionary. First argument accepts one of 
     four kinds B1ver, B1hor, A4ver, A4hor as strings. Second argument
