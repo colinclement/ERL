@@ -18,8 +18,14 @@ from numpy import sum, sqrt, einsum
 import os
 import matplotlib.pyplot as plt
 import re
+from socket import gethostname
 
-STUFFDIR = '/home/colinc/storage/ERL/ERLstuff'
+hostname = gethostname()
+if hostname == 'ept':
+    STUFFDIR = '/afs/msc.cornell.edu/home/jsethna/cc2285/storage/ERL/ERLstuff'
+elif hostname == 'heveled':	
+    STUFFDIR = '/home/colinc/storage/ERL/ERLstuff'
+
 walktree = os.walk(STUFFDIR,topdown=True, followlinks=False)
 allfiles=[]
 for folder in walktree:
@@ -118,10 +124,10 @@ def super_grid_parameters():
     deltaYs = y_ranges/pixels
     deltaX = np.median(deltaXs)/2. #factors chosen arbitrarily
     deltaY = np.median(deltaYs)/2.
-    min_dX = min(deltaXs)
-    min_dY = min(deltaYs)
-    Lx = max(x_ranges)
-    Ly = max(y_ranges)
+    min_dX = deltaXs.min()
+    min_dY = deltaYs.min()
+    Lx = x_ranges.max()
+    Ly = y_ranges.max()
     Nx = Lx/deltaX
     Ny = Ly/deltaY
     return {'Lx': Lx, 'Ly': Ly, 'deltaX': deltaXs, 'deltaY': deltaYs,

@@ -28,8 +28,7 @@ data = ia.interpolate_to_center(0)
 l,w = data.shape
 M = data.reshape(l*w)
 emittance = np.array(ia.emittance(data))
-
-print 'Progress = {} out of {}'.format(0, len(share_limit)-1)
+print 'Progress = {} out of {}'.format(0, number_limit-1)
 
 crapdata = []
 
@@ -50,9 +49,9 @@ if crapdata != []:
 U, S, Vt = svd(M, full_matrices = False)
 
 file0 = open('B1hor_range_limited_processed.npy','w+')
-np.savez(file0, data = M, emittances = emittance, super_grid = super_grid)
+np.tofile(file0,{'data': M, 'emittances': emittance, 'super_grid': super_grid})
 file0.close()
 
 file1 = open('B1hor_range_limit_SVD.npy','w')
-np.savez(file1, U = U, S = S, Vt = Vt, emittances = emittance)
+np.tofile(file1,{'U': U, 'S': S,'Vt': Vt, 'emittances': emittance})
 file1.close()
