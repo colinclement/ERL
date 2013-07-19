@@ -23,29 +23,34 @@ ia.grid_params['Lx'] = x_limit
 ia.grid_params['Ly'] = y_limit
 #Remake super grid
 ia.super_grid = ia.make_super_grid()
-
-data = ia.interpolate_to_center(0)
+with open('range_limited/B1hor_lr_super_grid.npy', 'w+') as sf:
+    np.savez(sf, super_grid = ia.super_grid)
+          
+data = ia.interpolate_to_center(share_limit[0])
+emit = np.array(ia.emittance(data))
 l,w = data.shape
-M = data.reshape(l*w)
-emittance = np.array(ia.emittance(data))
+data = data.reshape(l*w)
 print 'Progress = {} out of {}'.format(0, number_limit-1)
+with open('range_limited/B1hor_lr_{}.npy'.format(share_limit[0]),'w+') as df:
+    np.savez(df, M = data, emittance = emit, shape = (l,w)) 
 
 crapdata = []
-
-for num in share_limit:
+for num in share_limit[1:]:
     data = ia.interpolate_to_center(num)
     emit = ia.emittance(data)
     if data is None:
         print '****FILE NUMBER {} HAS ZERO MASS****'.format(num)
         crapdata.append(num)
         continue
-    M = np.vstack((M,data.reshape(l*w)))
-    emittance = np.hstack((emittance, np.array(emit)))
-    print 'Progress = {} out of {}'.format(num, number_limit-1)
+    #M = np.vstack((M,data.reshape(l*w)))
+    #emittance = np.hstack((emittance, np.array(emit)))
+    with open('range_limited/B1hor_lr_{}.npy'.format(num),'w+') as df:
+        np.savez(df, M = data, emittance = emit, shape = (l,w)) 
+    print 'Progress = {} out of {}'.format(num, share_limit.max())
 
 if crapdata != []:
     print 'crap data = ', crapdata
-
+"""
 U, S, Vt = svd(M, full_matrices = False)
 
 file0 = open('B1hor_range_limited_processed.npy','w+')
@@ -54,4 +59,4 @@ file0.close()
 
 file1 = open('B1hor_range_limit_SVD.npy','w')
 np.tofile(file1,{'U': U, 'S': S,'Vt': Vt, 'emittances': emittance})
-file1.close()
+file1.close()"""

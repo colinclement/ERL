@@ -101,7 +101,8 @@ def load_all_images(kind = 'B1hor'):
     outfile.close()
     return None
 
-#load_all_images()
+if __name__ == '__main__':
+    load_all_images()
 
 with open('B1hor_raw.npy','r') as infile:
     data = np.load(infile)
