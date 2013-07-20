@@ -229,7 +229,7 @@ def make_sparse_array(num):
     sparse_data = sparse.coo_matrix((values, pos), shape = data.shape)
     return {'sparse_data': sparse_data.tocsc(), 'emittance': emit}
 
-def image_interpolated_plot(num):
+def plot_interpolated_image(num):
     """Select number and super_grid parameters, will plot result"""
     data  = interpolate_to_center(num) 
     grid = super_grid
@@ -240,5 +240,5 @@ def image_interpolated_plot(num):
     cax1=ax.pcolormesh(super_grid[0], super_grid[1],data)
     f1.colorbar(cax1)
     plt.show()
-    print tp[0].shape
+    print data.shape
     return f1
