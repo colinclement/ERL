@@ -6,3 +6,4 @@ deprecated_scripts/*
 B1hor_processed_sparse/*
 ERLstuff/*
 old_results/*
+*.pkl
