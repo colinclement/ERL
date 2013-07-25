@@ -2,6 +2,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.colors as col
 try:
     import cPickle as pickle
 except ImportError:
@@ -16,6 +17,11 @@ with open('B1hor_limited/B1hor_limited_S.pkl','rb') as infile2:
 with open('B1hor_limited/B1hor_limited_emittances.pkl','rb') as infile3:
     emittances = pickle.load(infile3)
 
+nanvalues = [i for i in range(len(emittances)) if np.isnan(emittances[i])]     
+#set nans to finite value (near minimum)
+#Only 3 nan values exist so this isn't important
+emittances[nanvalues] = 0.0004
+
 #def image(num):
 #	return V[:,num].reshape(150,150)
 
@@ -27,21 +33,48 @@ with open('B1hor_limited/B1hor_limited_emittances.pkl','rb') as infile3:
 #	caxes=fig.add_axes([0.91,0.1,0.02,0.8])
 #	fig.colorbar(im,cax=caxes)
 
-def projection_plot():
-    """"""
+my_cdict = {'red': ((0.0, 0.0, 0.0),
+                    (0.06, 0.0, 0.0),
+                    (0.1, 0.7, 0.7),
+                    (0.15, 0.7, 0.7),
+                    (1.0, 1.0, 1.0)),
+           'green': ((0.0, 1.0, 1.0),
+                     (0.06, 0.5, 0.5), 
+                     (0.1, 0.0, 0.0),
+                     (0.15, 0.0, 0.0),
+                     (1.0, 0.0, 0.0)),
+           'blue': ((0.0, 0.0, 0.0),
+                    (0.06, 0.0, 0.0),
+                    (0.1, 0.7, 0.7),
+                    (0.15, 0.5, 0.5),
+                    (1.0, 0.0, 0.0))}
+my_cmap = col.LinearSegmentedColormap('my_cmap', my_cdict, N=256, gamma = 1.)
+
+def projection_plot(alpha = 0.6):
+    """Creates an upper triangular array of plots of the projection of the data
+    onto planes spanned by the singular vectors"""
     figs, axs = plt.subplots(nrows = 4, ncols = 4, figsize=(18,18))
-    colors = np.log(emittances+0.005)
-    cm = plt.cm.get_cmap('RdBu') #PiYg
+    plotorder = emittances.argsort()[::-1]
     projs = U #* S[:,None]
     for row in range(4):
         for col in range(4):
             if col>=row:
-                sc = axs[row,col].scatter(projs[:,row], projs[:,col+1], alpha = 0.55,
-		c = colors, marker = 'x', cmap = cm, vmin = min(colors), vmax = max(colors));
+                px = projs[:,row][plotorder]
+                py = projs[:,col+1][plotorder]
+                sc = axs[row,col].scatter(px, py,
+                                          alpha = alpha,
+		                                  c = emittances[plotorder], marker = 'o', 
+                                          cmap = my_cmap, vmin = emittances.min(), 
+                                          vmax = emittances.max());
                 axs[row,col].set_title('{} versus {}'.format(row+1,col+2))
             else:
                 axs[row,col].axis('off');
-    caxes = figs.add_axes([0.4, 0.3, 0.02, 0.19])
+    caxes = figs.add_axes([0.4, 0.15, 0.02, 0.19])
     plt.colorbar(sc, cax = caxes)
+    emit_spec_axs = figs.add_axes([0.15, 0.15, 0.18, 0.18])
+    emit_spec = np.sort(emittances)
+    emit_spec_axs.scatter(range(len(emit_spec)),emit_spec,
+                                c = emit_spec, cmap = my_cmap, linewidth=0)
+    emit_spec_axs.set_title('Spectrum of emittances')
     return None
 

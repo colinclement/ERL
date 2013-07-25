@@ -25,6 +25,8 @@ if hostname == 'ept':
     STUFFDIR = '/afs/msc.cornell.edu/home/jsethna/cc2285/storage/ERL/ERLstuff'
 elif hostname == 'heveled':	
     STUFFDIR = '/home/colinc/storage/ERL/ERLstuff'
+elif hostname == 'dain':
+    STUFFDIR = '/c/colin/ERL/ERLstuff'
 
 walktree = os.walk(STUFFDIR,topdown=True, followlinks=False)
 allfiles=[]

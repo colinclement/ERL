@@ -38,15 +38,16 @@ for file in file_list[1:]:
     print 'Loaded {} successfull'.format(file)
 U, S, Vt =  svd(M, full_matrices = False, overwrite_a = True)
 
-with open('B1hor_limited_U_matrix.pkl','w+') as outfile:
+with open('B1hor_limited_U_matrix.pkl','wb') as outfile:
     pickle.dump(U, outfile)
     del U
-with open('B1hor_limited_Vt_matrix.pkl', 'w+') as outfile:
+with open('B1hor_limited_Vt_matrix.pkl', 'wb') as outfile:
     pickle.dump(Vt, outfile)
     del Vt
-with open('B1hor_limited_S.pkl', 'w+') as outfile:
+with open('B1hor_limited_S.pkl', 'wb') as outfile:
     pickle.dump(S, outfile)
     del S
-with open('B1hor_limited_emittances.pkl','w+') as outfile:
-    pickle.dump(emittances, outfile)
-
+    
+with open('B1hor_limited_emittances.pkl','wb') as outfile:
+    pickle.dump(emittance, outfile)
+    del emittance

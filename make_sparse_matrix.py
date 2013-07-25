@@ -7,6 +7,7 @@ Script for constructing sparse matrix of images for performing and SVD.
 import image_analysis as ia
 import numpy as np
 import scipy.sparse as sparse
+from scipy.sparse.linalg import svds
 try:
     import cPickle as pickle
 except ImportError:
@@ -21,8 +22,8 @@ arr = data.reshape(l*w)
 columns, = arr.nonzero()
 values = np.array([arr[i] for i in columns])
 rows = np.array([0 for i in range(len(values))])
-print 'Progress 0 out of {}'.format(ia.max_number-1)
-
+print 'Progress = 0 out of {}'.format(ia.max_number-1)
+ia.max_number = 8 #for testing purposes
 for num in xrange(1, ia.max_number):
     data = ia.interpolate_to_center(num)
     emit = np.array(ia.emittance(data))
@@ -37,9 +38,12 @@ for num in xrange(1, ia.max_number):
     print 'Progress = {} out of {}'.format(num, ia.max_number-1)
 
 sparse_M = sparse.coo_matrix((values, (rows, columns)), shape =
-                             (4, l*w)).tocsc() #ia.max_number
-outdict = {'sparse_data': sparse_M, 'emittances': emittances}
+                             (ia.max_number, l*w)).tocsc() #ia.max_number
 
-with open('B1hor_sparse.pkl','w+') as outfile:
+Uk, Sk, Vtk = svds(sparse_M)#, k = 15)
+
+outdict = {'Uk': Uk, 'Sk': Sk, 'Vtk': Vtk, 'emittances': emittances}
+
+with open('B1hor_sparse_SVD.pkl','wb') as outfile:
     pickle.dump(outdict, outfile, protocol = -1)
 
