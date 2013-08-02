@@ -94,10 +94,15 @@ def load_all_images(kind = 'B1hor'):
     outlist = []
     for fil in range(length):
         tp = loadmat(sortedfiles[kind][fil])['data']
-	tpx = tp['x'][0,0]
-	tpy = tp['y'][0,0]
-	tpz = - tp['z'][0,0] #fixes inversion
-	outlist.append([tpx, tpy, tpz])
+        tpx = tp['x'][0,0]
+        tpy = tp['y'][0,0]
+        tpz = - tp['z'][0,0] #fixes inversion
+        p_val = tp['p'][0,0][0]
+        if p_val == 0.0:
+            #print 'file {} has p = 0.0'.format(fil)
+            continue
+        tpx = tpx/p_val
+        outlist.append([tpx, tpy, tpz, p_val])
     outfile = open('B1hor_raw.npy','w+')
     np.savez(outfile, data = outlist)
     outfile.close()
@@ -147,7 +152,7 @@ def subtract_background(num):
     pos = [pos for pos,value in enumerate(counts) if value == max(counts)]
     background_level = bins[pos[0]]
     temp[2] = temp[2]-background_level #subtract background
-    temp[2][abs(temp[2])<100] = 0.0 #clip small numbers
+    temp[2][abs(temp[2])<100.] = 0.0 #clip small numbers
     return temp
 
 def make_super_grid():
@@ -176,8 +181,9 @@ def interpolate_to_center(num):
     deltaY = grid_params['deltaY']
     indata = subtract_background(num)
     measuredpoints = np.vstack((indata[0].squeeze(),indata[1].squeeze())).T
-    x_space = np.arange(indata[0].min(), indata[0].max(), deltaX)
-    y_space = np.arange(indata[1].min(), indata[1].max(), deltaY)
+    res = int(np.sqrt(len(indata[0])))
+    x_space = np.linspace(indata[0].min(), indata[0].max(), 2*res)
+    y_space = np.linspace(indata[1].min(), indata[1].max(), 2*res)
     x_grid, y_grid = np.meshgrid(x_space, y_space)
     try:
         z_grid = griddata(measuredpoints, indata[2], (x_grid, y_grid), 
@@ -217,6 +223,8 @@ def emittance(data):
     xy = super_grid
     F = data 
     norm = abs(F.sum())
+    if norm == 0.0:
+        return None
     return 4*sqrt(det( 1./norm * einsum('iXY,jXY,XY->ij',xy,xy,F) ))
 
 def make_sparse_array(num):

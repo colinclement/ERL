@@ -14,11 +14,11 @@ except ImportError:
     import pickle
 import os
 
-walktree = os.walk('range_limited/', topdown = True)
+walktree = os.walk('B1hor_limited_results/range_selected_processed/', topdown = True)
 file_names = walktree.next()
 file_list = [os.path.join('range_limited/',file) for file in file_names[2]]
 file_list = [file for file in file_list if not file
-             =='range_limited/B1hor_lr_super_grid.npy']
+             =='B1hor_limited_results/range_selected_processed/B1hor_lr_super_grid.npy']
 with open(file_list[0],'r') as infile:
     data = np.load(infile)
     l, w  = data['shape']
